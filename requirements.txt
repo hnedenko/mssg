@@ -1,1 +1,13 @@
 feedparser
+chromadb
+requests
+bs4
+readability-lxml
+torch
+transformers
+numpy
+hf_xet
+sentence-transformers
+openai
+python-dotenv
+python-telegram-bot
