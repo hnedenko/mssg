@@ -1,5 +1,52 @@
 # mssg
-MSSG (Multilingual Sentiment Scraper Generator) - Modular Monolith AI-Powered positive News Generator (some local XLM-R, LLM)
+MSSG (Multilingual Sentiment Scraper Generator) - Modular Monolith AI-Powered positive News Generator (some local XLM-R, LLM) from TG-bot.
+
+# VALUE PROPOSITION
+
+## Multilingual Analysis
+Supports news analysis in RU, UK, and EN.
+
+## Semantic Deduplication
+Uses a vector database (ChromaDB) to filter out articles with similar meanings, ensuring unique content.
+
+## AI Rewriting
+Uses the LLM API for automatic translation, sentiment change (from neutral/negative to positive), and formatting of posts for Telegram.
+
+## Automated Cycle
+A fully autonomous script for parsing, processing, and publishing.
+
+# DEPLOY AND USAGE
+Clone repo:
+
+    git clone https://github.com/hnedenko/mssg.git
+
+Setup in .env file in .venv folder your own parameters like:
+
+    OPENAI_API_KEY = ""
+    TELEGRAM_BOT_TOKEN = ""
+    TELEGRAM_CHAT_ID = ""
+
+Run app
+
+    python maim.py
+
+The program should automatically install all the necessary libraries and models when first launched.
+
+Each time the program is run, it receives new articles, processes them, publishes them, and stopped.
+
+# TECH STACK
+
+## NLP/AI
+Hugging Face Transformers (XLM-RoBERTa), sentence-transformers
+
+## LLM API
+OpenAI (for rewriting and translation)
+
+## Vector Database
+ChromaDB
+
+## Other 
+python-telegram-bot, asyncio, python-dotenv
 
 # MODULES
 ## RSSParser
