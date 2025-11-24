@@ -1,5 +1,5 @@
 # mssg
-MSSG (Multilingual Sentiment Scraper Generator) - Modular Monolith AI-Powered positive News Generator (some local XLM-R, LLM) from TG-bot.
+MSSG (Multilingual Sentiment Scraper Generator) - Modular Monolith AI-Powered positive News Generator (local XLM-RoBERTa, LLM) for TG-bot.
 
 # VALUE PROPOSITION
 
