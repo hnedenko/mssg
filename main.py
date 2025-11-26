@@ -10,9 +10,10 @@ from modules.RSS_parser import RSSParser
 from modules.data_manager import DataManager
 from modules.HTML_scraper import HTMLScraper
 from modules.positivity_analyzer import PositivityAnalyser
+from modules.negativity_analyzer import NegativityAnalyser
 from modules.vectorizer import Vectorizer
 from modules.LLM_router import LLMRouter
-from modules.telegram_bot import TelegramBot
+from modules.telegram_bots import TelegramBots
 import asyncio
 
 
@@ -27,8 +28,11 @@ if __name__ == '__main__':
     HTML_scraper = HTMLScraper()
     vectorizer = Vectorizer()
     positivity_analyzer = PositivityAnalyser()
+    negativity_analyzer = NegativityAnalyser()
     llm_router = LLMRouter(config_manager.openai_api_key)
-    telegram_bot = TelegramBot(config_manager.telegram_bot_token, config_manager.telegram_chat_id)
+    telegram_bots = TelegramBots(config_manager.telegram_bot_positivity_token,
+                               config_manager.telegram_bot_negativity_token,
+                               config_manager.telegram_chat_id)
 
     # app loop for each article from RSS feed
     for article in rss_articles:
@@ -52,12 +56,23 @@ if __name__ == '__main__':
             if is_article_positivity and is_article_semantics_unique:
 
                 # API LLM call to translation and rewrite article
-                llm_router.add_rewrite_text_to_articles(article)
-                # article.set_rewrite_text(article.origin_text)
+                llm_router.add_rewrite_text_to_articles(article, "positivity")
 
                 # public article to "Positive News Dnipro&Ukraine" Telegram channel
-                asyncio.run(telegram_bot.send_post(article))
+                asyncio.run(telegram_bots.send_post_to_positivity_bot(article))
 
                 # Add new article to "positivity_articles" collection
                 data_manager.add_article_in_positivity_articles(article)
 
+            # check only "negativity" and "semantics_unique" to publication to "Negative News Dnipro&Ukraine" Telegram channel
+            is_article_negativity = negativity_analyzer.is_article_negativity(article, config_manager.negative_threshold)
+            is_article_semantics_unique = data_manager.is_article_semantics_unique_in_negativity_articles(article, config_manager.similarity_threshold)
+            if is_article_negativity and is_article_semantics_unique:
+                # API LLM call to translation and rewrite article
+                llm_router.add_rewrite_text_to_articles(article, "negativity")
+
+                # public article to "Negative News Dnipro&Ukraine" Telegram channel
+                asyncio.run(telegram_bots.send_post_to_negativity_bot(article))
+
+                # Add new article to "negativity_articles" collection
+                data_manager.add_article_in_negativity_articles(article)
