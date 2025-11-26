@@ -13,6 +13,10 @@ class ConfigManager:
         self.negative_threshold = 0.1
         self.similarity_threshold = 0.5
 
+        self.is_post_to_positive_channel = False
+        self.is_post_to_negative_channel = False
+        self.is_post_to_comfyui_channel = True
+
         load_dotenv(dotenv_path='.venv/.env')
         self.openai_api_key = os.getenv("OPENAI_API_KEY")
         self.telegram_bot_positivity_token = os.getenv("TELEGRAM_BOT_POSITIVITY_TOKEN")

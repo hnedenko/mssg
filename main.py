@@ -13,6 +13,7 @@ from modules.positivity_analyzer import PositivityAnalyser
 from modules.negativity_analyzer import NegativityAnalyser
 from modules.vectorizer import Vectorizer
 from modules.LLM_router import LLMRouter
+from modules.ComfyUI_router import ComfyUIRouter
 from modules.telegram_bots import TelegramBots
 import asyncio
 
@@ -30,6 +31,7 @@ if __name__ == '__main__':
     positivity_analyzer = PositivityAnalyser()
     negativity_analyzer = NegativityAnalyser()
     llm_router = LLMRouter(config_manager.openai_api_key)
+    comfyui_router = ComfyUIRouter()
     telegram_bots = TelegramBots(config_manager.telegram_bot_positivity_token,
                                config_manager.telegram_bot_negativity_token,
                                config_manager.telegram_chat_id)
@@ -50,10 +52,15 @@ if __name__ == '__main__':
             # Add new article to DB
             data_manager.add_article_in_main(article)
 
+            # ComfyUI flow to all "semantics_unique" news
+            is_article_semantics_unique = data_manager.is_article_semantics_unique_in_comfyui_articles(article, config_manager.similarity_threshold)
+            if config_manager.is_post_to_comfyui_channel and is_article_semantics_unique:
+                pass
+
             # check only "positivity" and "semantics_unique" to publication to "Positive News Dnipro&Ukraine" Telegram channel
             is_article_positivity = positivity_analyzer.is_article_positivity(article, config_manager.positive_threshold)
             is_article_semantics_unique = data_manager.is_article_semantics_unique_in_positivity_articles(article, config_manager.similarity_threshold)
-            if is_article_positivity and is_article_semantics_unique:
+            if config_manager.is_post_to_positive_channel and is_article_positivity and is_article_semantics_unique:
 
                 # API LLM call to translation and rewrite article
                 llm_router.add_rewrite_text_to_articles(article, "positivity")
@@ -67,7 +74,7 @@ if __name__ == '__main__':
             # check only "negativity" and "semantics_unique" to publication to "Negative News Dnipro&Ukraine" Telegram channel
             is_article_negativity = negativity_analyzer.is_article_negativity(article, config_manager.negative_threshold)
             is_article_semantics_unique = data_manager.is_article_semantics_unique_in_negativity_articles(article, config_manager.similarity_threshold)
-            if is_article_negativity and is_article_semantics_unique:
+            if config_manager.is_post_to_negative_channel and is_article_negativity and is_article_semantics_unique:
                 # API LLM call to translation and rewrite article
                 llm_router.add_rewrite_text_to_articles(article, "negativity")
 
